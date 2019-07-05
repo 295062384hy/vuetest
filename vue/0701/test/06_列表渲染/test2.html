@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>06_列表渲染_过滤与排序</title>
+</head>
+<body>
+<!--
+1. 列表过滤
+2. 列表排序
+-->
+
+<div id="demo">
+  <input type="text" v-model="searchName">
+  <ul>
+    <li v-for="(p, index) in filterPersons" :key="index">
+      {{index}}---{{p.name}}---{{p.age}}
+    </li>
+  </ul>
+  <button @click="orderType=2">年龄升序</button>
+  <button @click="orderType=3">年龄降序</button>
+  <button @click="orderType=1">原本顺序</button>
+</div>
+
+<script type="text/javascript" src="../js/vue.js"></script>
+<script type="text/javascript">
+  new Vue({
+    el: '#demo',
+    data: {
+      persons: [
+        {name: 'Tom', age: 15},
+        {name: 'Jack', age: 14},
+        {name: 'Bob', age: 18},
+        {name: 'Marry', age: 16},
+        {name: 'Rose', age: 17}
+      ],
+      searchName: '', // 搜索的关键字
+      orderType: 1, // 1: 不排序 2: 升 3: 降
+    },
+
+    computed: {
+      // 需要显示的过滤后的用户数组
+      filterPersons () {
+        // 得到所有相关的数据
+        const {persons, searchName, orderType} = this
+        // 计算处理得到结果, 并返回
+
+        // 过滤数组
+        const newPersons = persons.filter(p => {
+          return p.name.indexOf(searchName)!=-1
+        })
+
+        // 排序数组(orderType)
+        if(orderType!==1) {
+          newPersons.sort((p1, p2) => {
+            // 升序
+            if(orderType===2) {
+              return p1.age - p2.age
+            } else {
+              // 降序
+              return p2.age-p1.age
+            }
+          })
+        }
+
+
+        return newPersons
+
+      }
+    }
+  })
+</script>
+</body>
+</html>
