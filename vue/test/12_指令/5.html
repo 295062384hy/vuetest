@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>12_指令_自定义指令</title>
+</head>
+<body>
+
+<!--
+1. 注册全局指令
+  Vue.directive('my-directive', function(el, binding){
+    el.innerHTML = binding.value.toupperCase()
+  })
+2. 注册局部指令
+  directives : {
+    'my-directive' : {
+        bind (el, binding) {
+          el.innerHTML = binding.value.toupperCase()
+        }
+    }
+  }
+3. 使用指令
+  v-my-directive='xxx'
+-->
+
+<div id="h">
+    <span v-mybig="10">10</span>
+    <span v-mysmall="[1,2,3]">10</span>
+</div>
+
+
+
+<script type="text/javascript" src="../js/vue.js"></script>
+<script type="text/javascript">
+
+    Vue.directive('mysmall',function (el,b) {
+        console.log(el,b)
+    })
+new Vue({
+    el:'#h',
+    data:function () {
+        return{
+
+        }
+    },
+    directives:{
+        'mybig'(el,b){
+            console.log(el,b)
+        }
+    }
+})
+
+
+</script>
+</body>
+</html>
