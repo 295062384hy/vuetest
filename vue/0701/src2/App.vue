@@ -34,7 +34,7 @@
       delettodu:function (index) {
         this.todolist.splice(index,1)
       },
-      totalfinal:function () {
+       totalfinal:function () {
     return  this.todolist.reduce(function(total, currentValue){
         if(currentValue.isfalse){
           total+=1
