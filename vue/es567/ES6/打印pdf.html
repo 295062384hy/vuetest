@@ -1,0 +1,447 @@
+
+@extends( "master/main" ) @section('css')
+<style>
+    body,html{
+        height: 100%;
+        width: 100%;
+        background-color: white;
+    }
+    #table{
+        margin: 2%;
+        background-color: white;
+
+    }
+    .table-d table{border:1px solid black;border-collapse:collapse;background:black}
+    .table-d table td{border:1px solid black;background:#FFF}
+    .pstyle{
+        line-height: 40px;
+        font-weight: 700;
+        text-align: center;
+    }
+    .b10{
+        margin-bottom: 10px;
+    }
+    .spanstyle{
+        width: 33%;
+        display: inline-block;
+        font-weight: 700;
+        font-size: 12px;
+    }
+    .tablestyle{
+        font-weight: 700;
+        font-size: 12px;
+        text-align: center;
+        table-layout: fixed;
+    }
+    .tdstyle{
+        height: 100px;
+        min-width: 100px;
+    }
+    .tdstyleh{
+        height: 100px;
+    }
+    .table2{
+        /*width: 200px;*/
+        font-size: 12px;
+        height: 50px;
+    }
+    .h40{
+        height: 40px;
+    }
+    .w200{
+        max-height: 150px;
+        width: 200px;
+    }
+    .mt{
+        /*padding: 20px;*/
+        padding: 2%;
+        box-sizing: border-box;
+        height: 2530px;
+        background-color: white;
+    }
+    .bayertd{
+        height: 100px;
+        width: 200px;
+    }
+</style>
+@endsection @section( "content" )
+<div id="btn" v-loading.fullscreen.lock="fullscreenLoading">
+    <div style="text-align: right;margin: 15px">
+        <el-button type="primary" @click="downpdf"  size="small" >下载</el-button>
+    </div>
+    <div id="main" v-show="istrue" :class="{'table-d':browser==1}">
+        <div  id="table" :class="{'table-d':browser==1}" >
+            <div  v-for="(iteamy,indesx) in learningdata" class="mt " :class="{'table-d':browser==1}" >
+                <p>Opera ID:@{{ meetdata.opera_id?meetdata.opera_id:meetdata.opera_id_edit }}</p>
+                <p class="pstyle">Scientific Meeting Attendance Record (electronic)</p>
+                <p class="pstyle b10">学术(电子)会议签到表@{{ indesx+1 }}</p>
+                <div class="b10">
+                    <span class="spanstyle">Meeting Name 活动名称：@{{ meetdata.event_name }} </span>
+                    <span class="spanstyle">Date 日期：
+                            @{{ meetdata.event_start_date }} -@{{ meetdata.event_end_date }} </span>
+                    <span v-if="meetdata.category!=3" class="spanstyle">Meeting Venue 会议地点：   @{{ meetdata.city_desc }} </span>
+
+                    <span v-else class="spanstyle">Meeting Venue 会议地点：  @{{meetdata.overseas_city}}</span>
+                </div>
+                <table cellspacing="0" cellpadding="0" :border="browser==1?0:1"  class="tablestyle">
+                    <tr >
+                        <td rowspan="3" class="tdstyle">
+                            NO.编号
+                        </td>
+                        <td rowspan="3"  class="tdstyle">
+                            Name 姓名(打印／正楷)
+                        </td>
+                        <td rowspan="3"  class="tdstyle">
+                            Hospital/Employer医院/工作单位（打印/正楷）
+                        </td>
+                        <td rowspan="3"  class="tdstyleh">
+                            Department 科室/部门（打印/正楷）
+                        </td>
+                        <td  colspan="4"  class="table2">
+                            Job Information工作信息(For Other HCP and Non-HCP, please specify the job name.如为其他医疗卫生专业人士或非医疗卫生专业人士，请注明工作名称)
+                        </td>
+
+                        <td  colspan="3" class="table2">
+                            Meeting Role 会议职责 (For Others, please specify the role name.如为其他，请注明职责名称。)
+                        </td>
+                        <td rowspan="3" class="tdstyleh"> Signature 签名</td>
+                    </tr>
+                    <tr>
+                        <td  rowspan="2" class="table2">
+                            State Employee/Hospital Director/Vice Director国家工作人员/医院正副院长
+                        </td>
+                        <td  colspan="2"  class="table2">HCPl 医疗卫生专业人士 </td>
+                        <td rowspan="2"  class="table2">Non-HCP 非医疗卫生专业人士</td>
+                        <td  rowspan="2"  class="table2"> Speaker 讲者 </td>
+                        <td  rowspan="2" class="table2"> Participant 参会者 </td>
+                        <td  rowspan="2" class="table2"> Others 其他 </td>
+                    </tr>
+                    <tr>
+                        <td  class="tdstyleh"> Doctor 医生 </td>
+                        <td  class="tdstyleh"> Other HCP 其他医疗卫生专业人士 </td>
+                    </tr>
+
+                    <tr class="h40" v-for="(item,index) in iteamy" >
+                        <td>@{{ item.code }}</td>
+                        <td>@{{ item.name }}</td>
+                        <td>@{{ item.company }}</td>
+                        <td>@{{ item.department }}</td>
+                        <td>@{{ item.minister }}</td>
+                        <td>@{{ item.doctor }}</td>
+                        <td>@{{ item.else_medical }}</td>
+                        <td>@{{ item.non_medical }}</td>
+                        <td>@{{ item.speakers }}</td>
+                        <td>@{{ item.participant }}</td>
+                        <td>@{{ item.other_staffs }}</td>
+                        <td style="height: 150px">
+                            <img v-if="(item.open_id==''||item.open_id=='0')&&item.signature" :src="urldownimg(item.signature)" class="w200">
+                            </img>
+                            <span v-if="item.open_id!=''||item.open_id!='0'" >@{{item.open_id  }}</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div  v-for="(bayeriteamy,indesx) in bayerarr" class="mt "  :class="{'table-d':browser==1}">
+                <p>Opera ID:@{{ meetdata.opera_id?meetdata.opera_id:meetdata.opera_id_edit }}</p>
+                <p class="pstyle">Scientific Meeting Attendance Record (electronic)</p>
+                <p class="pstyle b10">学术(电子)会议签到表@{{ indesx+1 }}</p>
+                <div class="b10">
+                    <span class="spanstyle">Meeting Name 活动名称：@{{ meetdata.event_name }} </span>
+                    <span class="spanstyle">Date 日期：
+                            @{{ meetdata.event_start_date }} -@{{ meetdata.event_end_date }} </span>
+                    <span v-if="meetdata.category!=3" class="spanstyle">Meeting Venue 会议地点：   @{{ meetdata.city_desc }} </span>
+
+                    <span v-else class="spanstyle">Meeting Venue 会议地点：  @{{meetdata.overseas_city}}</span>
+                </div>
+                <div class="b10">
+                    <span class="spanstyle">Bayer Employees 拜耳员工: </span>
+                </div>
+                <table cellspacing="0" cellpadding="0" :border="browser==1?0:1"  class="tablestyle">
+                    <tr>
+                        <td  class="bayertd">NO.编号</td>
+                        <td  class="bayertd">Name 姓名(打印／正楷)</td>
+                        <td  class="bayertd">Department 部门</td>
+                        <td class="bayertd">CWID</td>
+                        <td  class="bayertd">Signature 签名</td>
+                    </tr>
+                    <tr style="height: 40px" v-for="(item,index) in bayeriteamy">
+                        <td>@{{ item.code }}</td>
+                        <td>@{{ item.name }}</td>
+                        <td>@{{ item.department }}</td>
+                        <td>@{{ item.cwid }}</td>
+                        <td style="height: 150px">
+                            <img v-if="(item.open_id==''||item.open_id=='0')&&item.signature" :src="urldownimg(item.signature)" style="width: 200px;max-height: 200px">
+                            </img>
+                            <span v-if="item.open_id!=''||item.open_id!='0'" >@{{item.open_id  }}</span>
+                        </td>
+
+                    </tr>
+
+
+                </table>
+            </div>
+
+        </div>
+        <div id="display" :class="{'table-d':browser==1}">
+        </div>
+    </div>
+</div>
+@endsection @section( 'js' )
+{{--<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>--}}
+{{--<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.0.272/jspdf.debug.js"></script>--}}
+{{--<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>--}}
+<script>
+    new Vue({
+        el: '#btn',
+        data: function () {
+            return {
+                meetdata:'',
+                learningdata:[],
+                bayerarr:[],
+                metid:'',
+                istrue:false,
+                fullscreenLoading:false,
+                browser:'1'
+
+            }
+        },
+        mounted: function () {
+            this.urlfu()
+            this.getMeetBasic()
+            this.myBrowser()
+        },
+        beforeUpdata:function () {
+        },
+        methods: {
+            myBrowser:function () {
+                var userAgent = navigator.userAgent; //取得浏览器的userAgent字符串
+                if (userAgent.indexOf("Chrome") > -1||userAgent.indexOf("Firefox") > -1) {
+                    this.browser='2'
+                }else {
+                    this.browser='1'
+                }
+            },
+
+            downpdf:function () {
+                this.fullscreenLoading = true //laoding层控制
+                this.print_qr()
+            },
+            urlfu: function () {
+                var url = location.search; //获取url中"?"符后的字串
+                var theRequest = new Object();
+                if (url.indexOf("?") != -1) {
+                    var str = url.substr(1);
+                    strs = str.split("&");
+                    for (var i = 0; i < strs.length; i++) {
+                        theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+                    }
+                }
+                this.metid = theRequest.id
+
+            }, //截取id
+            urldownimg:function (url) {
+                return '/'+url
+            },
+            getMeetBasic: function () {
+                var that = this,
+                    data = {
+                        event_id:this.metid
+                    };
+//                    that.fullscreenLoading = true //laoding层控制
+                axios.post('/externalApi/exportSignList', data)
+                    .then(function (response) {
+                        if (response.data.code == "1") {
+                            that.fullscreenLoading = false //laoding层控制
+                            that.meetdata = response.data.data.basic
+                            if(response.data.data.noBayer.length>0){
+                                that.learningdata = response.data.data.noBayer
+//                                        for(i=4;i<13;i++){
+//                                            that.learningdata[0][i] = response.data.data.noBayer[0]
+//                                        }
+//                                        for(i=2;i<3;i++){
+//                                            that.learningdata[i] = that.learningdata[0]
+//                                        }
+
+                            }else{
+                                that.learningdata = [{}]
+                            }
+                            if(response.data.data.bayer.length>0){
+                                that.bayerarr = response.data.data.bayer
+//                                        for(i=4;i<13;i++){
+//                                            that.bayerarr[0][i] = response.data.data.bayer[0]
+//                                        }
+//                                        for(i=2;i<10;i++){
+//                                            that.bayerarr[i] = that.bayerarr[0]
+//                                        }
+                            }else{
+                                that.bayerarr = [{}]
+                            }
+
+                            that.istrue=true
+                        } else {
+                            that.fullscreenLoading = false //laoding层控制
+                            that.$alert(response.data.msg, '{{trans('meeting.xxts')}}', {
+                                confirmButtonText: '{{trans('meeting.queding')}}',
+                                callback: function (action) {
+                            }
+                        });
+                        }
+                    })
+                    .catch(function (error) {});
+            },
+            print_qr:function () {
+                var that = this
+                var height = $("#main").height()
+                //克隆节点，默认为false，不复制方法属性，为true是全部复制。
+                var cloneDom = $("#main").clone(true);
+                //设置克隆节点的css属性，因为之前的层级为0，我们只需要比被克隆的节点层级低即可。
+                cloneDom.css({
+                    "background-color": "white",
+                    "position": "absolute",
+                    "top": "0px",
+                    "z-index": "-1",
+                    "height": height,
+                });
+                //将克隆节点动态追加到body后面。
+                $("#display").append(cloneDom);
+                //插件生成base64img图片。
+
+                html2canvas(cloneDom, {
+                    //Whether to allow cross-origin images to taint the canvas
+                    allowTaint: true,
+                    //Whether to test each image if it taints the canvas before drawing them
+                    taintTest: false,
+                    onrendered:function(canvas) {
+                        var contentWidth = canvas.width;
+                        var contentHeight = canvas.height;
+                        //一页pdf显示html页面生成的canvas高度;
+                        var pageHeight = contentWidth / 592.28 * 841.89;
+                        //未生成pdf的html页面高度
+                        var leftHeight = contentHeight;
+                        //页面偏移
+                        var position = 0;
+                        //a4纸的尺寸[595.28,841.89]，html页面生成的canvas在pdf中图片的宽高
+                        var imgWidth = 595.28;
+                        var imgHeight = 592.28/contentWidth * contentHeight;
+                        var pageData = canvas.toDataURL('image/jpeg', 1.0)
+//                            var pageData = canvas.toDataURL('image/jpeg', 1.0).split('base64,')[1];
+                        var pdf = new jsPDF('', 'pt', 'a4');
+                        //有两个高度需要区分，一个是html页面的实际高度，和生成pdf的页面高度(841.89)
+                        //当内容未超过pdf一页显示的范围，无需分页
+
+                        if (leftHeight < pageHeight) {
+                            pdf.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight );
+                        } else {
+                            while(leftHeight > 0) {
+                                pdf.addImage(pageData, 'JPEG', 0, position, imgWidth, imgHeight)
+                                leftHeight -= pageHeight;
+                                position -= 841.89;
+                                //避免添加空白页
+                                if(leftHeight > 0) {
+                                    pdf.addPage();
+                                }
+                            }
+                        }
+                        that.fullscreenLoading =false
+
+                        pdf.save('content.pdf');
+//                        location.reload()
+                    }
+
+                });
+
+
+
+
+
+//                        return
+//
+//                        var targetDom = $("#table");
+//                        var copyDom = targetDom.clone();
+//                        copyDom.width(targetDom.width() + "px");
+//                        copyDom.height(targetDom.height() + "px");
+//                        $('body').append(copyDom);
+//
+//                        html2canvas(copyDom, {
+//                            allowTaint: true,
+//                            taintTest: false,
+//                            onrendered:function(canvas) {
+//                                var contentWidth = canvas.width;
+//                                var contentHeight = canvas.height;
+//                                //一页pdf显示html页面生成的canvas高度;
+//                                var pageHeight = contentWidth / 592.28 * 841.89;
+//                                //未生成pdf的html页面高度
+//                                var leftHeight = contentHeight;
+//                                //页面偏移
+//                                var position = 0;
+//                                //a4纸的尺寸[595.28,841.89]，html页面生成的canvas在pdf中图片的宽高
+//                                var imgWidth = 595.28;
+//                                var imgHeight = 592.28/contentWidth * contentHeight;
+//                                var pageData = canvas.toDataURL('image/jpeg', 1.0);
+//                                var pdf = new jsPDF('', 'pt', 'a4');
+//                                //有两个高度需要区分，一个是html页面的实际高度，和生成pdf的页面高度(841.89)
+//                                //当内容未超过pdf一页显示的范围，无需分页
+//
+//                                if (leftHeight < pageHeight) {
+//                                    pdf.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight );
+//                                } else {
+//                                    while(leftHeight > 0) {
+//                                        pdf.addImage(pageData, 'JPEG', 0, position, imgWidth, imgHeight)
+//                                        leftHeight -= pageHeight;
+//                                        position -= 841.89;
+//                                        //避免添加空白页
+//                                        if(leftHeight > 0) {
+//                                            pdf.addPage();
+//                                        }
+//                                    }
+//                                }
+//                                pdf.save('content.pdf');
+//                            }
+//                        });
+//
+//                        var dom = document.getElementById('table')
+//                        html2canvas(dom, {
+//                            type: 'view',
+////                    height: $('#u_content').outerHeight() + 2000,
+//                            onrendered:function(canvas) {
+//                                var contentWidth = canvas.width;
+//                                var contentHeight = canvas.height;
+//                                //一页pdf显示html页面生成的canvas高度;
+//                                var pageHeight = contentWidth / 592.28 * 841.89;
+//                                //未生成pdf的html页面高度
+//                                var leftHeight = contentHeight;
+//                                //页面偏移
+//                                var position = 0;
+//                                //a4纸的尺寸[595.28,841.89]，html页面生成的canvas在pdf中图片的宽高
+//                                var imgWidth = 595.28;
+//                                var imgHeight = 592.28/contentWidth * contentHeight;
+//                                var pageData = canvas.toDataURL('image/jpeg', 1.0);
+//                                var pdf = new jsPDF('', 'pt', 'a4');
+//                                //有两个高度需要区分，一个是html页面的实际高度，和生成pdf的页面高度(841.89)
+//                                //当内容未超过pdf一页显示的范围，无需分页
+//
+//                                if (leftHeight < pageHeight) {
+//                                    pdf.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight );
+//                                } else {
+//                                    while(leftHeight > 0) {
+//                                        pdf.addImage(pageData, 'JPEG', 0, position, imgWidth, imgHeight)
+//                                        leftHeight -= pageHeight;
+//                                        position -= 841.89;
+//                                        //避免添加空白页
+//                                        if(leftHeight > 0) {
+//                                            pdf.addPage();
+//                                        }
+//                                    }
+//                                }
+//                                pdf.save('content.pdf');
+//                            }
+//                        })
+
+            },
+
+        }
+    })
+</script>
+
+@endsection

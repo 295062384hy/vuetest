@@ -1,0 +1,1160 @@
+<template>
+    <div>
+        <el-row class="accounts_navigation">
+            <el-col :span="21" :offset="1">
+                <el-button type="primary" v-show="!judgment_type" @click="jumpPages(2)">申请关团</el-button>
+            </el-col>
+            <el-col :span="2" :offset="judgment_type?22:0">
+                <el-button type="primary" @click="jumpPages(1)">返回</el-button>
+            </el-col>
+        </el-row>
+        <div class="accounts_info" v-loading.fullscreen.lock="fullscreenLoading">
+            <div class="accounts_main">
+                <el-row>
+                    <el-col :span="24">
+                        <span>基本信息</span>
+                    </el-col>
+                </el-row>
+                <el-form label-width="150px">
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="项目号:">
+                                <span>{{ base_info.project_no }}</span>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="项目名称:">
+                                <span>{{ base_info.name }}</span>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="项目开始日期:">
+                                <span>{{ base_info.start_time }}</span>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="公司主体:">
+                                <span>{{ base_info.company_main }}</span>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="客户名称:">
+                                <span>{{ base_info.company_name }}</span>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="团队类型:">
+                                <span>2</span>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="预计回款时间:">
+                                <el-date-picker
+                                        :disabled="judgment_type"
+                                        v-model="actual_info.repay_time"
+                                        type="datetime"
+                                        placeholder="选择日期"
+                                >
+                                </el-date-picker>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="关联审批:">
+                                <span>2</span>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-form>
+            </div>
+            <div class="accounts_main">
+                <el-row>
+                    <el-col :span="24">
+                        <span>财务信息</span>
+                    </el-col>
+                </el-row>
+                <el-form label-width="150px">
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="预算信息">
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="决算信息">
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="中标营业额(含税):">
+                                <span>{{ finance_info.total_cost }}</span>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="客户决算金额(含税):">
+                                <span>{{ audit_statistic.total_cost }}</span>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="预计返佣金额:">
+                                <span>{{ finance_info.commission_money }}</span>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="实际返佣金额:">
+                                <span>{{ audit_statistic.commission_money }}</span>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="预计总收入:">
+                                <span>{{ finance_info.income_money }}</span>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="退款金额:">
+                                <span>2</span>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="预计支出额:">
+                                <span>{{ finance_info.expend_money }}</span>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="实际总收入:">
+                                <span>{{ audit_statistic.income_money }}</span>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="预计税金:">
+                                <span>{{ finance_info.tax_money }}</span>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="实际支出额:">
+                                <span>{{ audit_statistic.expend_money }}</span>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="毛利:">
+                                <span>{{ finance_info.profit_money }}</span>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="税金:">
+                                <span>{{ audit_statistic.tax_money }}</span>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="毛利率:">
+                                <span>{{ finance_info.profit_rate }}</span>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="毛利:">
+                                <span>{{ audit_statistic.profit_money }}</span>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="">
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="毛利率:">
+                                <span>{{ audit_statistic.profit_rate }}</span>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="">
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="理由:">
+                                <el-input
+                                        type="textarea"
+                                        :rows="3"
+                                        resize="none"
+                                        :disabled="judgment_type"
+                                        maxlength="200"
+                                        v-model="financialReason"
+                                >
+                                </el-input>
+                                <span class="textarea_tips">{{ financialReason.length }}/200</span>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-form>
+            </div>
+            <div class="accounts_main">
+                <el-row>
+                    <el-col :span="3">
+                        <span>支出明细</span>
+                    </el-col>
+                    <el-col :span="5">
+                        <span>预计支出总计:{{expend_info.total_amount}}</span>
+                    </el-col>
+                    <el-col :span="5">
+                        <span>已支出总计:{{expend_info.total_amount_already}}</span>
+                    </el-col>
+                    <el-col :span="5">
+                        <span>待支出总计:{{expend_info.total_amount_wait}}</span>
+                    </el-col>
+                </el-row>
+                <div class="table_crevice">
+                    <el-row>
+                        <el-col :span="1" :offset="1">
+                            <span>酒店</span>
+                        </el-col>
+                        <el-col :span="5">
+                            <span>预计支出合计:{{expend_info.hotel_amount}}</span>
+                        </el-col>
+                        <el-col :span="5">
+                            <span>已支出合计:{{expend_info.hotel_amount_already}}</span>
+                        </el-col>
+                        <el-col :span="5">
+                            <span>待支出合计:{{expend_info.hotel_amount_wait}}</span>
+                        </el-col>
+                    </el-row>
+                </div>
+                <el-row v-for="(item,index) in hotel_cost_detail" :key="index">
+                    <el-col :span="23" :offset="1">
+                        <table border="1">
+                            <tr>
+                                <td class="bg-td" rowspan="6">
+                                    <el-row>
+                                        <span>{{ item.type_name }}</span>
+                                    </el-row>
+                                    <el-row>
+                                        <el-col :span="10" :offset="2">
+                                            <span>实际支出</span>
+                                        </el-col>
+                                        <el-col :span="10" :offset="1">
+                                            <span>{{item.total_amount}}</span>
+                                        </el-col>
+                                    </el-row>
+                                    <el-row>
+                                        <el-col :span="10" :offset="2">
+                                            <span>已支出</span>
+                                        </el-col>
+                                        <el-col :span="10" :offset="1">
+                                            <span>{{item.final_already_expend}}</span>
+                                        </el-col>
+                                    </el-row>
+                                    <el-row>
+                                        <el-col :span="10" :offset="2">
+                                            <span>待支出</span>
+                                        </el-col>
+                                        <el-col :span="10" :offset="1">
+                                            <span>{{item.final_wait_expend}}</span>
+                                        </el-col>
+                                    </el-row>
+                                </td>
+                                <td class="bg-td">类型</td>
+                                <td class="bg-td">实际支出</td>
+                                <td class="bg-td">已支出</td>
+                                <td class="bg-td">待支出</td>
+                                <td class="bg-td">发票类型</td>
+                                <td class="bg-td">返佣</td>
+                                <td class="bg-td">退款</td>
+                                <td class="bg-td" v-show="!judgment_type">操作</td>
+                            </tr>
+                            <tr v-for="(expend,expendindex) in item.expend_detail" :key="expend.mice_id">
+                                <td>{{expenditure_type[expend.type]}}</td>
+                                <td>{{expend.price}}</td>
+                                <td rowspan="4" v-if="expendindex==0">{{item.final_already_expend}}</td>
+                                <td rowspan="4" v-if="expendindex==0">{{item.final_wait_expend}}</td>
+                                <td rowspan="4" v-if="expendindex==0">
+                                    <el-row>
+                                        <el-col :span="23" :offset="1" v-for="(service,serviceindex) in item.service_invoice" :key="serviceindex">
+                                            <span>实际支出{{service.money}}</span>
+                                            <el-select v-model="service.type" placeholder="专票6%会议费" size="mini">
+                                                <el-option :value="invoiceitem.type" v-for="(invoiceitem,invoiceindex) in invoice_type" :label="invoiceitem.name" :key="invoiceindex"></el-option>
+                                            </el-select>
+                                        </el-col>
+                                    </el-row>
+                                </td>
+                                <td rowspan="4" v-if="expendindex==0">{{item.commission_money}}</td>
+                                <td rowspan="4" v-if="expendindex==0">{{item.final_refund_money}}</td>
+                                <td rowspan="5" v-show="!judgment_type&&expendindex==0">
+                                    <el-button size="mini" type="text">付款申请</el-button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>附件</td>
+                                <td colspan="6"></td>
+                            </tr>
+                        </table>
+                    </el-col>
+                </el-row>
+                <!--服务商-->
+                <div class="table_crevice">
+                    <el-row>
+                        <el-col :span="2" :offset="1">
+                            <span>服务商</span>
+                        </el-col>
+                        <el-col :span="5">
+                            <span>预计支出合计:{{expend_info.service_amount}}</span>
+                        </el-col>
+                        <el-col :span="5">
+                            <span>已支出合计:{{expend_info.service_amount_already}}</span>
+                        </el-col>
+                        <el-col :span="5">
+                            <span>待支出合计:{{expend_info.service_amount_wait}}</span>
+                        </el-col>
+                    </el-row>
+                </div>
+                <el-row>
+                    <el-col :span="23" :offset="1">
+                        <table border="1">
+                            <tr>
+                                <td class="bg-td" rowspan="5">
+                                    <el-row>
+                                        <span>中国大酒店</span>
+                                    </el-row>
+                                    <el-row>
+                                        <el-col :span="10" :offset="2">
+                                            <span>实际支出</span>
+                                        </el-col>
+                                        <el-col :span="10" :offset="1">
+                                            <span>12312312</span>
+                                        </el-col>
+                                    </el-row>
+                                    <el-row>
+                                        <el-col :span="10" :offset="2">
+                                            <span>已支出</span>
+                                        </el-col>
+                                        <el-col :span="10" :offset="1">
+                                            <span>12312312</span>
+                                        </el-col>
+                                    </el-row>
+                                    <el-row>
+                                        <el-col :span="10" :offset="2">
+                                            <span>待支出</span>
+                                        </el-col>
+                                        <el-col :span="10" :offset="1">
+                                            <span>12312312</span>
+                                        </el-col>
+                                    </el-row>
+                                </td>
+                                <td class="bg-td">附件</td>
+                                <td class="bg-td">实际支出</td>
+                                <td class="bg-td">已支出</td>
+                                <td class="bg-td">待支出</td>
+                                <td class="bg-td">发票类型</td>
+                                <td class="bg-td">返佣</td>
+                                <td class="bg-td">退款</td>
+                                <td class="bg-td" v-show="!judgment_type">操作</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="4">1212</td>
+                                <td rowspan="4">1212</td>
+                                <td rowspan="4">1212</td>
+                                <td rowspan="4">1212</td>
+                                <td rowspan="4">
+                                    <el-row>
+                                        <el-col :span="23" :offset="1">
+                                            <span>实际支出</span>
+                                            <el-select v-model="hotel" placeholder="专票6%会议费" size="mini">
+                                                <el-option value="1" label="选项一"></el-option>
+                                                <el-option value="2" label="选项二"></el-option>
+                                                <el-option value="3" label="选项三"></el-option>
+                                            </el-select>
+                                        </el-col>
+                                    </el-row>
+                                    <el-row>
+                                        <el-col :span="23" :offset="1">
+                                            <span>实际支出</span>
+                                            <el-select v-model="hotel" placeholder="专票6%会议费" size="mini">
+                                                <el-option value="1" label="选项一"></el-option>
+                                                <el-option value="2" label="选项二"></el-option>
+                                                <el-option value="3" label="选项三"></el-option>
+                                            </el-select>
+                                        </el-col>
+                                    </el-row>
+                                </td>
+                                <td rowspan="4">1212</td>
+                                <td rowspan="4">1212</td>
+                                <td rowspan="5" v-show="!judgment_type">付款申请</td>
+                            </tr>
+                        </table>
+                    </el-col>
+                </el-row>
+                <!--线下酒店-->
+                <div class="table_crevice">
+                    <el-row>
+                        <el-col :span="3" :offset="1">
+                            <span>线下酒店</span>
+                        </el-col>
+                        <el-col :span="5">
+                            <span>预计支出合计:{{expend_info.offline_amount}}</span>
+                        </el-col>
+                        <el-col :span="5">
+                            <span>已支出合计:{{expend_info.offline_amount_already}}</span>
+                        </el-col>
+                        <el-col :span="5">
+                            <span>待支出合计:{{expend_info.offline_amount_wait}}</span>
+                        </el-col>
+                    </el-row>
+                </div>
+                <el-row>
+                    <el-col :span="23" :offset="1">
+                        <table border="1">
+                            <tr>
+                                <td class="bg-td" rowspan="6">
+                                    <el-row>
+                                        <span>中国大酒店</span>
+                                    </el-row>
+                                    <el-row>
+                                        <el-col :span="10" :offset="2">
+                                            <span>实际支出</span>
+                                        </el-col>
+                                        <el-col :span="10" :offset="1">
+                                            <span>12312312</span>
+                                        </el-col>
+                                    </el-row>
+                                    <el-row>
+                                        <el-col :span="10" :offset="2">
+                                            <span>已支出</span>
+                                        </el-col>
+                                        <el-col :span="10" :offset="1">
+                                            <span>12312312</span>
+                                        </el-col>
+                                    </el-row>
+                                    <el-row>
+                                        <el-col :span="10" :offset="2">
+                                            <span>待支出</span>
+                                        </el-col>
+                                        <el-col :span="10" :offset="1">
+                                            <span>12312312</span>
+                                        </el-col>
+                                    </el-row>
+                                </td>
+                                <td class="bg-td">类型</td>
+                                <td class="bg-td">实际支出</td>
+                                <td class="bg-td">已支出</td>
+                                <td class="bg-td">待支出</td>
+                                <td class="bg-td">发票类型</td>
+                                <td class="bg-td">返佣</td>
+                                <td class="bg-td">退款</td>
+                                <td class="bg-td" v-show="!judgment_type">操作</td>
+                            </tr>
+                            <tr>
+                                <td>会议室</td>
+                                <td>1212</td>
+                                <td rowspan="4">1212</td>
+                                <td rowspan="4">1212</td>
+                                <td rowspan="4">
+                                    <el-row>
+                                        <el-col :span="23" :offset="1">
+                                            <span>实际支出</span>
+                                            <el-select v-model="hotel" placeholder="专票6%会议费" size="mini">
+                                                <el-option value="1" label="选项一"></el-option>
+                                                <el-option value="2" label="选项二"></el-option>
+                                                <el-option value="3" label="选项三"></el-option>
+                                            </el-select>
+                                        </el-col>
+                                    </el-row>
+                                    <el-row>
+                                        <el-col :span="23" :offset="1">
+                                            <span>实际支出</span>
+                                            <el-select v-model="hotel" placeholder="专票6%会议费" size="mini">
+                                                <el-option value="1" label="选项一"></el-option>
+                                                <el-option value="2" label="选项二"></el-option>
+                                                <el-option value="3" label="选项三"></el-option>
+                                            </el-select>
+                                        </el-col>
+                                    </el-row>
+                                </td>
+                                <td rowspan="4">1212</td>
+                                <td rowspan="4">1212</td>
+                                <td rowspan="5" v-show="!judgment_type">付款申请</td>
+                            </tr>
+                            <tr>
+                                <td>餐饮</td>
+                                <td>1212</td>
+                            </tr>
+                            <tr>
+                                <td>客房</td>
+                                <td>1212</td>
+                            </tr>
+                            <tr>
+                                <td>其他</td>
+                                <td>1212</td>
+                            </tr>
+                            <tr>
+                                <td>附件</td>
+                                <td colspan="6"></td>
+                            </tr>
+                        </table>
+                    </el-col>
+                </el-row>
+                <!--备用金-->
+                <div class="table_crevice">
+                    <el-row>
+                        <el-col :span="2" :offset="1">
+                            <span>备用金</span>
+                        </el-col>
+                        <el-col :span="5">
+                            <span>预计支出合计:{{expend_info.imprest_amount}}</span>
+                        </el-col>
+                        <el-col :span="5">
+                            <span>已支出合计:{{expend_info.imprest_amount_already}}</span>
+                        </el-col>
+                        <el-col :span="5">
+                            <span>待支出合计:{{expend_info.imprest_amount_wait}}</span>
+                        </el-col>
+                    </el-row>
+                </div>
+                <el-row>
+                    <el-col :span="23" :offset="1">
+                        <table border="1">
+                            <tr>
+                                <td class="bg-td" rowspan="5">
+                                    <el-row>
+                                        <span>中国大酒店</span>
+                                    </el-row>
+                                    <el-row>
+                                        <el-col :span="10" :offset="2">
+                                            <span>实际支出</span>
+                                        </el-col>
+                                        <el-col :span="10" :offset="1">
+                                            <span>12312312</span>
+                                        </el-col>
+                                    </el-row>
+                                    <el-row>
+                                        <el-col :span="10" :offset="2">
+                                            <span>已支出</span>
+                                        </el-col>
+                                        <el-col :span="10" :offset="1">
+                                            <span>12312312</span>
+                                        </el-col>
+                                    </el-row>
+                                    <el-row>
+                                        <el-col :span="10" :offset="2">
+                                            <span>待支出</span>
+                                        </el-col>
+                                        <el-col :span="10" :offset="1">
+                                            <span>12312312</span>
+                                        </el-col>
+                                    </el-row>
+                                </td>
+                                <td class="bg-td">类型</td>
+                                <td class="bg-td">预提取金额</td>
+                                <td class="bg-td">已提取金额</td>
+                                <td class="bg-td">退款</td>
+                                <td class="bg-td">理由</td>
+                                <td class="bg-td">状态</td>
+                                <td class="bg-td" v-show="!judgment_type">操作</td>
+                            </tr>
+                            <tr>
+                                <td>备用金</td>
+                                <td>12312312</td>
+                                <td>12312312</td>
+                                <td>12312312</td>
+                                <td></td>
+                                <td>审批中</td>
+                                <td v-show="!judgment_type">
+                                    <el-button size="mini" type="text">付款</el-button>
+                                    <el-button size="mini" type="text">退款</el-button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>垫付／报销</td>
+                                <td>12312312</td>
+                                <td>12312312</td>
+                                <td>12312312</td>
+                                <td></td>
+                                <td>审批中</td>
+                                <td v-show="!judgment_type">
+                                    <el-button size="mini" type="text">付款</el-button>
+                                    <el-button size="mini" type="text">退款</el-button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>差旅</td>
+                                <td>12312312</td>
+                                <td>12312312</td>
+                                <td>12312312</td>
+                                <td></td>
+                                <td>审批中</td>
+                                <td v-show="!judgment_type">
+                                    <el-button size="mini" type="text">付款</el-button>
+                                    <el-button size="mini" type="text">退款</el-button>
+                                </td>
+                            </tr>
+                        </table>
+                    </el-col>
+                </el-row>
+            </div>
+            <div class="accounts_main">
+                <el-row>
+                    <el-col :span="24">
+                        <span>发票信息</span>
+                    </el-col>
+                </el-row>
+                <el-form label-width="150px">
+                    <el-row>
+                        <el-col :span="24">
+                            <el-form-item label="发票类型:">
+                                <el-select v-model="invoice_content.type" size="mini">
+                                    <el-option :value="1" label="增值税专用发票"></el-option>
+                                    <el-option :value="2" label="增值税普通发票"></el-option>
+                                </el-select>
+                                <el-select v-model="invoice_content.item" placeholder="" size="mini">
+                                    <el-option :value="1" label="此讯鉴证咨询服务费"></el-option>
+                                    <el-option :value="2" label="研发技术技术服务费"></el-option>
+                                    <el-option :value="3" label="会议会展会议费"></el-option>
+                                    <el-option :value="4" label="广告广告费"></el-option>
+                                    <el-option :value="5" label="经济代理代定餐费"></el-option>
+                                    <el-option :value="6" label="旅游服务团费"></el-option>
+                                    <el-option :value="7" label="会议会展*会议费"></el-option>
+                                    <el-option :value="8" label="酒水（明细）"></el-option>
+                                </el-select>
+                                <el-select v-model="invoice_content.tax_rate" placeholder="" size="mini">
+                                    <el-option :value="invoice_content.tax_rate" :label="invoice_content.tax_rate"></el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="发票公司抬头:">
+                                <el-select placeholder="请选择" size="mini" v-model="invoice_index">
+                                    <el-option
+                                            v-for="(items,index) in customer_account"
+                                            :key="items.id"
+                                            :label="items.invoice_title"
+                                            :value="index"
+                                    ></el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="税号:">
+                                <span>{{ customer_account[invoice_index].duty_paragraph }}</span>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="地址:">
+                                <span>{{ customer_account[invoice_index].address }}</span>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="电话:">
+                                <span>{{ customer_account[invoice_index].telephone_number }}</span>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="开户行:">
+                                <span>{{ customer_account[invoice_index].opening_bank }}</span>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="账号:">
+                                <span>{{ customer_account[invoice_index].account_number }}</span>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="发票邮寄地址:">
+                                <el-input v-model="actual_info.mail_address" placeholder="请输入内容" :disabled="judgment_type"></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="12">
+                            <el-form-item label="发票联系人:">
+                                <el-input v-model="actual_info.invoice_contact_name" placeholder="请输入内容" :disabled="judgment_type"></el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="发票联系人电话:">
+                                <el-input v-model="actual_info.invoice_contact_mobile" placeholder="请输入内容" :disabled="judgment_type"></el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-form>
+            </div>
+            <div class="accounts_main">
+                <el-row>
+                    <el-col :span="24">
+                        <span>支持文件</span>
+                    </el-col>
+                </el-row>
+                <el-form label-width="150px">
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="客户结算单:">
+                                <el-upload
+                                        :action="upload_url"
+                                        :on-preview="PreviewFile"
+                                        :on-remove="removeFile"
+                                        :on-success="file_success"
+                                        multiple
+                                        :disabled="judgment_type"
+                                        :data="enclosureData"
+                                        :file-list="bill_file_detail"
+                                >
+                                    <el-button size="small" type="primary" v-show="!judgment_type">上传</el-button>
+                                </el-upload>
+                            </el-form-item>
+                        </el-col>
+
+                        <el-col :span="12">
+                            <el-form-item label="客户结算确认文件(邮件/PO等):">
+                                <el-upload
+                                        :action="upload_url"
+                                        :on-preview="PreviewFile"
+                                        :on-remove="removeFile"
+                                        :on-success="file_success"
+                                        multiple
+                                        :disabled="judgment_type"
+                                        :data="enclosureData"
+                                        :file-list="confirm_file_detail"
+                                >
+                                    <el-button size="small" type="primary" v-show="!judgment_type">上传</el-button>
+                                </el-upload>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-form-item label="其他结算材料:">
+                                <el-upload
+                                        :action="upload_url"
+                                        :on-preview="PreviewFile"
+                                        :on-remove="removeFile"
+                                        :on-success="file_success"
+                                        multiple
+                                        :disabled="judgment_type"
+                                        :data="enclosureData"
+                                        :file-list="other_file_detail"
+                                >
+                                    <el-button size="small" type="primary" v-show="!judgment_type">上传</el-button>
+                                </el-upload>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+                </el-form>
+            </div>
+            <button @click="overbudget=true">测试输入金额谈框</button>
+            <button @click="reserveRefund=true">测试退款谈框</button>
+
+            <el-dialog
+                    title="xxx审批付款单"
+                    :visible.sync="overbudget"
+                    width="50%"
+            >
+                <div class="accounts_main">
+                    <el-row>
+                        <el-col :span="24">
+                            <span>基本信息</span>
+                        </el-col>
+                    </el-row>
+                    <el-form label-width="150px">
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item label="项目号:">
+                                    <span>1</span>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="项目名称:">
+                                    <span>2</span>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item label="项目开始日期:">
+                                    <span>1</span>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="公司主体:">
+                                    <span>2</span>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item label="预算毛利率:">
+                                    <span>1</span>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="预计回款时间:">
+                                    <span>2</span>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item label="支付币种:">
+                                    <el-select v-model="hotel" placeholder="专票6%会议费" size="mini">
+                                        <el-option value="1" label="选项一"></el-option>
+                                        <el-option value="2" label="选项二"></el-option>
+                                        <el-option value="3" label="选项三"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="返佣金额:">
+                                    <span>2</span>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item label="支付金额:">
+                                    <el-select v-model="hotel" placeholder="专票6%会议费" size="mini">
+                                        <el-option value="1" label="选项一"></el-option>
+                                        <el-option value="2" label="选项二"></el-option>
+                                        <el-option value="3" label="选项三"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="支付费用类型:">
+                                    <el-select v-model="hotel" placeholder="专票6%会议费" size="mini">
+                                        <el-option value="1" label="选项一"></el-option>
+                                        <el-option value="2" label="选项二"></el-option>
+                                        <el-option value="3" label="选项三"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="12" :offset="3">
+                                填写金额已超过预算金额请填写
+                                <el-button type="primary" size="mini">超预算审批</el-button>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="12">
+                                <el-form-item label="支付日期:">
+                                    <el-date-picker
+                                            v-model="value1"
+                                            type="date"
+                                            size="mini"
+                                            :width="150"
+                                            placeholder="选择日期"
+                                    >
+                                    </el-date-picker>
+                                </el-form-item>
+                            </el-col>
+                            <el-col :span="12">
+                                <el-form-item label="已支付金额:">
+                                    <span>1</span>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="24">
+                                <el-form-item label="其他结算材料:">
+                                    <el-upload
+                                            class="upload-demo"
+                                            action="https://jsonplaceholder.typicode.com/posts/"
+                                            :on-preview="handlePreview"
+                                            :on-remove="handleRemove"
+                                            :before-remove="beforeRemove"
+                                            multiple
+                                            :limit="3"
+                                            :on-exceed="handleExceed"
+                                            :file-list="fileList"
+                                    >
+                                        <el-button size="small" type="primary">上传</el-button>
+                                        <div slot="tip" class="el-upload__tip">支持jpg,png,pdf,上限5个</div>
+                                    </el-upload>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="16">
+                                <el-form-item label="理由:">
+                                    <el-input
+                                            type="textarea"
+                                            :rows="3"
+                                            resize="none"
+                                            maxlength="100"
+                                            v-model="financialReason"
+                                    >
+                                    </el-input>
+                                    <span class="textarea_tips">{{ financialReason.length }}/100</span>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="13" :offset="2">
+                                <el-button type="primary" @click="overbudget=false">取消</el-button>
+                            </el-col>
+                            <el-col :span="5" :offset="4">
+                                <el-button type="primary">提交</el-button>
+                            </el-col>
+                        </el-row>
+                    </el-form>
+                </div>
+            </el-dialog>
+            <el-dialog
+                    title="xxx退款"
+                    :visible.sync="reserveRefund"
+                    width="30%"
+            >
+                <div class="accounts_main">
+                    <el-form label-width="80px">
+                        <el-row>
+                            <el-col :span="24">
+                                <el-form-item label="退款金额:">
+                                    <el-input v-model="input" placeholder="请输入退款金额"></el-input>
+                                </el-form-item>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="13" :offset="2">
+                                <el-button type="primary" @click="reserveRefund=false">取消</el-button>
+                            </el-col>
+                            <el-col :span="5" :offset="4">
+                                <el-button type="primary">提交</el-button>
+                            </el-col>
+                        </el-row>
+                    </el-form>
+                </div>
+            </el-dialog>
+        </div>
+    </div>
+</template>
+
+<script>
+    import { getAccountsInfo } from '@/api/team_accounts'
+    import { ajaxDeleteGroupEnclosures } from '@/api/group/baseinfo'
+
+    export default {
+        name: 'AccountsInfo',
+        data() {
+            return {
+                fullscreenLoading: false,
+                judgment_type: false, // false查看详情页面  true申请关团页面
+                expected_repayment_time: '', // 预计回款时间
+                financialReason: '', // 财务信息理由
+                hotel: '', // 酒店
+                overbudget: false, // 超预算
+                reserveRefund: false, // 备用金退款
+                base_info: '', // 基本信息
+                finance_info: '', // 财务信息
+                audit_statistic: '', // 决算信息
+                expend_info:'',//支付信息
+                hotel_cost_detail: '', // 酒店金额信息
+                service_cost_detail: '', // 服务商信息
+                offline_cost_detail: '', // 线下酒店信息
+                imprest_cost_detail: '', // 备用金信息
+                actual_info: '', // 发票信息以及附件
+                invoice_content: '', // 发票信息发票类型
+                customer_account: '', // 开户信息
+                invoice_index: 0, // 选择的开户行信息
+                invoice_type:[
+                    {name:'会议类3%增值税专用发票',type:1},
+                    {name:'会议类5%增值税专用发票',type:2},
+                    {name:'会议类5%增值税专用发票',type:3},
+                    {name:'会议类增值税普通发票',type:4},
+                    {name:'会议类增值税普通发票',type:5}
+                ],//开票分类
+                expenditure_type:['','会议室','客房','餐饮','设备','其他','','','','服务商','线下酒店'],//支出类型
+                enclosureData: {
+                    type: 6,
+                    meeting_id: 6
+                }, // 附件上传所需要参数
+                bill_file_detail: '', // 客户结算附件
+                confirm_file_detail: '', // 客户结算确认附件
+                other_file_detail: '', // 其他结算附件
+                upload_url: '',
+
+            }
+        },
+        created() {
+            this.judgment_type = this.$route.query.judgment_type==='false'?false:true
+            this.getInfoData({
+                group_id: 6,
+                audit_id: 7,
+                type: 4
+            });
+        },
+        methods: {
+            getInfoData: function(params) {
+                getAccountsInfo(params)
+                    .then((res) => {
+                        this.upload_url = res.request.responseURL.split('api')[0] + '/api/group/upload_enclosure'
+                        const { data, status } = res.data;
+                        if (status === 200) {
+                            this.base_info = data.base_info
+                            this.finance_info = data.expend_info.finance_info
+                            this.hotel_cost_detail = data.expend_info.hotel_cost_detail
+                            this.expend_info = data.expend_info
+                            this.audit_statistic = data.audit_statistic
+                            this.actual_info = data.actual_info
+                            this.actual_info.repay_time = this.time_cycle(data.actual_info.repay_time)
+                            this.customer_account = data.customer_account
+                            if (data.expend_info.invoice_content) {
+                                this.invoice_content = data.expend_info.invoice_content[0]
+                            }
+
+                            this.bill_file_detail = [{ enclosure_id: 1, name: '2', enclosure_url: 3 }, { enclosure_id: 21, name: '222', enclosure_url: 3 }]
+                        } else {
+                            this.$alert(res.data.message, '提示信息', {
+                                confirmButtonText: '确定',
+                                callback: () => {
+
+                                }
+                            })
+                        }
+                    })
+            },
+            PreviewFile: function(file) {
+                window.open(file.enclosure_url)
+            },
+            removeFile(file, fileList, index) {
+                console.log(file, fileList, index)
+                if (file.status === 'ready') return
+                const fileId = { id: file.enclosure_id };
+                ajaxDeleteGroupEnclosures(fileId).then(res => {
+                    const status = res.data.status;
+                    if (status === 200) {
+                        this.$message({
+                            type: 'success',
+                            message: '添加成功',
+                        });
+                    } else {
+                        this.$message.error({
+                            duration: 2000,
+                            message: res.data.message
+                        });
+                        fileList.push(file)
+                    }
+                }).catch(e => {
+                    console.log(e);
+                });
+            },
+            file_success: function(response, file, fileList) {
+                if (response.status === 200) {
+                    this.$alert('上传成功', '提示信息', {
+                        confirmButtonText: '确定',
+                        callback: () => {
+
+                        }
+                    })
+                } else {
+                    this.$alert(response.message, '提示信息', {
+                        confirmButtonText: '确定',
+                        callback: () => {
+                            fileList.pop()
+                        }
+                    })
+                }
+            },
+            time_cycle: function formatDateTime(inputTime) {
+                if (!inputTime) {
+                    return "{{trans('meeting.meiyou')}}"
+                }
+                var time = parseInt(inputTime) * 1000
+                var now = new Date(time);
+                var y = now.getFullYear();
+                var m = now.getMonth() + 1;
+                var d = now.getDate();
+                return y + '-' + (m < 10 ? '0' + m : m) + '-' + (d < 10 ? '0' + d : d) + ' ' + now.toTimeString().substr(
+                    0, 8);
+            },
+            jumpPages: function(type) {
+                if (type === 1) {
+                    this.$router.push('/accounts_list')
+                } else {
+                    this.$router.push({ path: '/accounts_info', query: { id: 7, audit_id: 7, username: 7, judgment_type: 'true' }});
+                }
+            }
+        }
+    }
+</script>
+
+<style lang="scss">
+    .accounts_navigation{
+        background-color: white;
+        height: 50px;
+        margin: 20px;
+        padding: 6px;
+        border-radius: 10px;
+    }
+    .accounts_info{
+        margin: 20px;
+        background-color: white;
+        border-radius: 10px;
+        padding: 10px;
+        color: #545C64;
+    .el-form-item{
+        margin-bottom: 13px;
+    }
+    .accounts_main{
+        margin-top: 10px;
+        border-bottom: 1px solid rgba(153, 153, 153, 1);
+        padding: 10px;
+        overflow: hidden;
+    .table_crevice{
+        margin: 20px 0px 10px 0px;
+    }
+    .el-row{
+        margin: 5px 0px;
+    }
+    table {
+        width: 100%;
+        border-spacing: 0;
+        border-collapse: collapse;
+        text-align: center;
+        border: none;
+    .bg-td {
+        background-color: #f1f4f9;
+    }
+    td {
+        height: 30px;
+        font-size: 14px;
+        padding-left: 10px;
+    }
+    }
+    .textarea_tips{
+        position: absolute;
+        right: 1%;
+        bottom: -35%;
+    }
+    .el-input--mini .el-input__inner{
+        width: 150px;
+    }
+    }
+
+    }
+
+</style>
+

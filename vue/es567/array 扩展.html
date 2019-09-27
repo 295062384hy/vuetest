@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="author" content="http://www.softwhy.com/" />
+    <title>蚂蚁部落</title>
+    <style>
+        body{
+            background-color:#ccc;
+        }
+        .main{
+            width:100px;
+            height:100px;
+            position:relative;
+        }
+        .content{
+            width:90px;
+            height:90px;
+            text-align:center;
+            line-height:90px;
+            background-color:rgba(255,255,255,0.9);
+            border-radius:50%;
+            position:absolute;
+            top:5px;
+            left:5px;
+        }
+        .bg{
+            width:50px;
+            height:100px;
+            position:absolute;
+            overflow: hidden;
+            animation:run 10s infinite linear;
+            transform-origin: right center;
+            box-shadow:inset #000 0 0 0 1px;
+        }
+        .bgInsed{
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            position: absolute;
+            background-color: green;
+            clip: rect(0,50px,100px,0px);
+            transform: rotate(80deg);
+        }
+
+        /*@keyframes run{*/
+            /*0%{*/
+                /*transform:rotate(0deg);*/
+            /*}*/
+            /*100%{*/
+                /*transform:rotate(360deg);*/
+            /*}*/
+        /*}*/
+    </style>
+</head>
+<body>
+<div class="main">
+    <div class="bg">
+        <div class="bgInsed"></div>
+    </div>
+    <div class="content">蚂蚁</div>
+</div>
+</body>
+</html>
